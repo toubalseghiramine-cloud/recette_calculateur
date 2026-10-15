@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Coût Recettes</title>
+  <meta name="description" content="Calcul du coût de revient et du prix de vente des recettes de pâtisserie.">
+
+  <!-- PWA : manifest, couleurs et icônes -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#9c4a2a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1b1613" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+
+  <!-- iPhone / iPad : icône et mode "application" -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Coût Recettes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== Barre du haut ===== -->
+  <header class="topbar">
+    <button id="btn-back" class="icon-btn" type="button" aria-label="Retour" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+    <h1 id="page-title">Mes produits</h1>
+    <span id="save-status" class="save-status" aria-live="polite"></span>
+  </header>
+
+  <main>
+    <!-- ===== Onglet : Mes produits ===== -->
+    <section id="view-products" class="view">
+      <div class="search">
+        <input type="search" id="product-search" placeholder="Rechercher un produit…" autocomplete="off" aria-label="Rechercher un produit">
+      </div>
+      <ul id="product-list" class="card-list"></ul>
+      <p id="product-empty" class="empty" hidden></p>
+      <button id="btn-add-product" class="fab" type="button" aria-label="Ajouter un produit">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+    </section>
+
+    <!-- ===== Onglet : Mes recettes ===== -->
+    <section id="view-recipes" class="view" hidden>
+      <div class="search">
+        <input type="search" id="recipe-search" placeholder="Rechercher une recette…" autocomplete="off" aria-label="Rechercher une recette">
+      </div>
+      <ul id="recipe-list" class="card-list"></ul>
+      <p id="recipe-empty" class="empty" hidden></p>
+      <button id="btn-add-recipe" class="fab" type="button" aria-label="Créer une recette">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </button>
+    </section>
+
+    <!-- ===== Éditeur d'une recette ===== -->
+    <section id="view-editor" class="view" hidden>
+      <div class="card form">
+        <label class="field">
+          <span>Nom de la recette</span>
+          <input id="r-name" type="text" placeholder="Ex. : Tarte au citron" autocomplete="off" enterkeyhint="done">
+        </label>
+        <div class="row">
+          <label class="field">
+            <span>Portions</span>
+            <input id="r-portions" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+          <label class="field">
+            <span>Coefficient</span>
+            <input id="r-coef" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+        </div>
+      </div>
+
+      <h2 class="section-title">Ingrédients</h2>
+      <p id="no-products-hint" class="hint warning" hidden>
+        Vous n'avez encore aucun produit. Ajoutez d'abord vos produits dans l'onglet « Mes produits ».
+      </p>
+      <ul id="ingredient-list" class="ingredient-list"></ul>
+      <button id="btn-add-ingredient" class="btn btn-secondary btn-block" type="button">+ Ajouter un ingrédient</button>
+
+      <div class="card summary">
+        <div class="summary-row"><span>Coût total de la recette</span><strong id="sum-total"></strong></div>
+        <div class="summary-row"><span>Coût par portion</span><strong id="sum-portion"></strong></div>
+        <div class="summary-row highlight"><span>Prix de vente conseillé / portion</span><strong id="sum-sale-portion"></strong></div>
+        <div class="summary-row highlight"><span>Prix de vente conseillé (recette entière)</span><strong id="sum-sale-total"></strong></div>
+        <p id="sum-warning" class="hint warning" hidden></p>
+      </div>
+
+      <div class="actions">
+        <button id="btn-duplicate" class="btn btn-secondary" type="button">Dupliquer</button>
+        <button id="btn-delete-recipe" class="btn btn-danger" type="button">Supprimer</button>
+      </div>
+    </section>
+
+    <!-- ===== Onglet : Réglages ===== -->
+    <section id="view-settings" class="view" hidden>
+      <div class="card form">
+        <h2>Devise</h2>
+        <label class="field">
+          <span>Devise affichée</span>
+          <input id="s-currency" type="text" maxlength="10" placeholder="DA, €, $…" autocomplete="off">
+        </label>
+        <p class="hint">Exemple d'affichage : <strong id="s-currency-example"></strong></p>
+      </div>
+
+      <div class="card form">
+        <h2>Sauvegarde</h2>
+        <p class="hint">
+          Vos données sont enregistrées uniquement sur cet appareil.
+          Exportez régulièrement une sauvegarde, surtout avant de changer de téléphone.
+        </p>
+        <p id="s-stats" class="stats"></p>
+        <button id="btn-export" class="btn btn-primary btn-block" type="button">Exporter mes données</button>
+        <button id="btn-share" class="btn btn-secondary btn-block" type="button" hidden>Envoyer la sauvegarde (e-mail, WhatsApp…)</button>
+        <button id="btn-import" class="btn btn-secondary btn-block" type="button">Importer une sauvegarde</button>
+        <!-- Pas d'attribut "accept" : certains iPhone grisent les fichiers .json sinon -->
+        <input id="import-file" type="file" hidden>
+      </div>
+
+      <div class="card form">
+        <h2>Installer l'application</h2>
+        <p id="install-done" class="hint" hidden>✓ L'application est installée sur cet appareil.</p>
+        <button id="btn-install" class="btn btn-primary btn-block" type="button" hidden>Installer sur cet appareil</button>
+        <p id="install-ios" class="hint" hidden>
+          Sur iPhone : ouvrez ce site dans <strong>Safari</strong>, touchez le bouton
+          <strong>Partager</strong> (carré avec une flèche), puis <strong>« Sur l'écran d'accueil »</strong>.
+        </p>
+        <p id="install-other" class="hint" hidden>
+          Ouvrez le menu du navigateur (⋮) et choisissez <strong>« Installer l'application »</strong>
+          ou <strong>« Ajouter à l'écran d'accueil »</strong>.
+        </p>
+      </div>
+
+      <p id="app-version" class="version"></p>
+    </section>
+  </main>
+
+  <!-- ===== Barre d'onglets (en bas, accessible au pouce) ===== -->
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="#produits" class="tab" data-tab="produits">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l8-4 8 4v10l-8 4-8-4z M4 7l8 4 8-4 M12 11v10" /></svg>
+      <span>Mes produits</span>
+    </a>
+    <a href="#recettes" class="tab" data-tab="recettes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h11a1 1 0 0 1 1 1v17H7a2 2 0 0 1-2-2V4a1 1 0 0 1 1-1z M5 19a2 2 0 0 1 2-2h11 M9 7h6 M9 11h6" /></svg>
+      <span>Mes recettes</span>
+    </a>
+    <a href="#reglages" class="tab" data-tab="reglages">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10 M18 6h2 M4 12h4 M12 12h8 M4 18h12 M20 18h0" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="18" cy="18" r="2" /></svg>
+      <span>Réglages</span>
+    </a>
+  </nav>
+
+  <!-- ===== Fenêtre : ajouter / modifier un produit ===== -->
+  <dialog id="product-dialog" aria-labelledby="pd-title">
+    <form id="product-form" novalidate>
+      <h2 id="pd-title">Nouveau produit</h2>
+      <label class="field">
+        <span>Nom du produit</span>
+        <input id="p-name" type="text" placeholder="Ex. : Farine T55" autocomplete="off" enterkeyhint="next">
+      </label>
+      <label class="field">
+        <span>Unité d'achat</span>
+        <select id="p-unit">
+          <option value="kg">kg (kilogramme)</option>
+          <option value="g">g (gramme)</option>
+          <option value="l">litre</option>
+          <option value="ml">ml (millilitre)</option>
+          <option value="piece">pièce</option>
+        </select>
+      </label>
+      <div class="row">
+        <label class="field">
+          <span>Quantité achetée</span>
+          <input id="p-qty" type="text" inputmode="decimal" placeholder="Ex. : 25" autocomplete="off">
+        </label>
+        <label class="field">
+          <span>Prix payé (<span class="currency"></span>)</span>
+          <input id="p-price" type="text" inputmode="decimal" placeholder="Ex. : 2500" autocomplete="off">
+        </label>
+      </div>
+      <p id="p-preview" class="preview"></p>
+      <p id="p-usage" class="hint"></p>
+      <p id="p-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button id="p-delete" class="btn btn-danger" type="button">Supprimer</button>
+        <button id="p-cancel" class="btn btn-secondary" type="button">Annuler</button>
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Messages courts ("Produit enregistré", etc.) -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Bandeau affiché quand une nouvelle version de l'app est disponible -->
+  <div id="update-banner" class="update-banner" hidden>
+    <span>Nouvelle version disponible.</span>
+    <button id="btn-reload" class="btn btn-primary" type="button">Mettre à jour</button>
+  </div>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+/* ============================================================
+   styles.css — apparence de l'application
+   Pensé d'abord pour le téléphone : gros boutons (48 px mini),
+   texte lisible, barre d'onglets en bas accessible au pouce.
+   ============================================================ */
+
+/* ---------- Couleurs (thème clair) ---------- */
+:root {
+  --primary: #9c4a2a;        /* caramel / chocolat */
+  --primary-ink: #ffffff;    /* texte sur fond primaire */
+  --primary-soft: #f6e6da;
+  --bg: #faf6f1;
+  --surface: #ffffff;
+  --text: #2b211c;
+  --muted: #75665d;
+  --border: #e6dbd0;
+  --danger: #b3261e;
+  --danger-soft: #fbe9e7;
+  --header-bg: var(--primary);
+  --header-ink: #ffffff;
+  --shadow: 0 1px 3px rgba(60, 30, 10, 0.12);
+  --radius: 14px;
+  --tabbar-h: 64px;
+  color-scheme: light;
+}
+
+/* ---------- Couleurs (thème sombre automatique) ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #e8936a;
+    --primary-ink: #1b1613;
+    --primary-soft: #3a2a22;
+    --bg: #1b1613;
+    --surface: #27201c;
+    --text: #f3ece6;
+    --muted: #b3a59a;
+    --border: #3d332d;
+    --danger: #ff8a80;
+    --danger-soft: #3d2220;
+    --header-bg: #27201c;
+    --header-ink: #f3ece6;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+/* 16 px minimum dans les champs : évite le zoom automatique sur iPhone */
+input, select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  font-size: 17px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+}
+input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Barre du haut ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: env(safe-area-inset-top) 16px 0;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  background: var(--header-bg);
+  color: var(--header-ink);
+}
+.topbar h1 {
+  flex: 1;
+  margin: 0;
+  padding: 14px 0;
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar .icon-btn { margin-left: -10px; color: inherit; }
+.save-status { font-size: 14px; opacity: 0.9; white-space: nowrap; }
+
+/* ---------- Contenu ---------- */
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 12px 16px calc(var(--tabbar-h) + 96px + env(safe-area-inset-bottom));
+}
+
+.search { margin-bottom: 12px; }
+.search input { border-radius: 999px; padding-left: 18px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+.card h2 { margin: 0 0 10px; font-size: 18px; }
+.card + .card { margin-top: 14px; }
+
+/* Listes de produits / recettes */
+.card-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.card-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  min-height: 64px;
+}
+.card-btn:active { background: var(--primary-soft); }
+.card-title { font-weight: 600; font-size: 18px; overflow-wrap: anywhere; }
+.card-sub { grid-column: 1; color: var(--muted); font-size: 15px; }
+.card-price { grid-column: 2; grid-row: 1 / span 2; text-align: right; font-weight: 700; color: var(--primary); white-space: nowrap; }
+.card-price small { display: block; font-weight: 500; font-size: 13px; color: var(--muted); }
+.card-warning { grid-column: 1 / -1; color: var(--danger); font-size: 14px; }
+
+.empty { text-align: center; color: var(--muted); padding: 32px 16px; }
+
+/* Formulaires */
+.form { display: grid; gap: 12px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > span { font-size: 15px; font-weight: 600; color: var(--muted); }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+
+.hint { margin: 0; color: var(--muted); font-size: 15px; }
+.hint.warning { color: var(--danger); }
+.stats { margin: 0; font-weight: 600; }
+.version { text-align: center; color: var(--muted); font-size: 14px; margin-top: 20px; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  min-height: 48px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--primary); color: var(--primary-ink); }
+.btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-danger { background: var(--danger-soft); color: var(--danger); }
+.btn-block { width: 100%; }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.icon-btn:active { background: rgba(127, 127, 127, 0.2); }
+
+/* Bouton rond "+" flottant */
+.fab {
+  position: fixed;
+  right: max(20px, calc((100vw - 760px) / 2 + 20px));
+  bottom: calc(var(--tabbar-h) + 20px + env(safe-area-inset-bottom));
+  z-index: 5;
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-ink);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.fab svg { width: 32px; height: 32px; stroke-width: 2.5; }
+.fab:active { transform: scale(0.95); }
+
+/* ---------- Barre d'onglets ---------- */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.tab {
+  flex: 1;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+.tab.active { color: var(--primary); }
+.tab.active svg { stroke-width: 2.4; }
+
+/* ---------- Éditeur de recette ---------- */
+.section-title { font-size: 18px; margin: 22px 4px 10px; }
+
+.ingredient-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
+.ingredient { padding: 10px 12px; display: grid; gap: 8px; }
+.ing-top { display: flex; gap: 6px; align-items: center; }
+.ing-top select { flex: 1; min-width: 0; }
+.ing-remove { color: var(--muted); }
+.ing-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px; align-items: center; }
+.ing-cost { text-align: right; font-weight: 700; white-space: nowrap; }
+.ingredient.orphan { border-color: var(--danger); }
+.ingredient.orphan .ing-product { color: var(--danger); }
+
+.summary { margin-top: 18px; display: grid; gap: 4px; }
+.summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; align-items: baseline; }
+.summary-row + .summary-row { border-top: 1px dashed var(--border); }
+.summary-row strong { white-space: nowrap; font-size: 18px; }
+.summary-row.highlight strong { color: var(--primary); }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+
+/* ---------- Fenêtre produit ---------- */
+dialog {
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto auto 0;          /* en bas de l'écran sur téléphone */
+  padding: 20px 16px calc(16px + env(safe-area-inset-bottom));
+  border: none;
+  border-radius: 20px 20px 0 0;
+  background: var(--surface);
+  color: var(--text);
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+dialog form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+dialog h2 { margin: 0; font-size: 20px; }
+.preview { margin: 0; padding: 12px; border-radius: 10px; background: var(--primary-soft); font-weight: 600; }
+.form-error { margin: 0; color: var(--danger); font-weight: 600; }
+.form-error:empty { display: none; }
+.hint:empty { display: none; }
+.dialog-actions { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; }
+.dialog-actions .btn { padding-left: 8px; padding-right: 8px; }
+
+/* ---------- Messages ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 20px);
+  z-index: 20;
+  max-width: calc(100% - 32px);
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #2b211c;
+  color: #fff;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.update-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: calc(64px + env(safe-area-inset-top));
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 10px 10px 10px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------- Ordinateur / tablette ---------- */
+@media (min-width: 700px) {
+  dialog { width: 520px; margin: auto; border-radius: 20px; padding-bottom: 20px; }
+  .card-list { grid-template-columns: 1fr 1fr; }
+}
+
+/* Très petits écrans : on empile les champs */
+@media (max-width: 360px) {
+  .row { grid-template-columns: 1fr; }
+  .dialog-actions { grid-template-columns: 1fr 1fr; }
+  .dialog-actions .btn-primary { grid-column: 1 / -1; }
+}
